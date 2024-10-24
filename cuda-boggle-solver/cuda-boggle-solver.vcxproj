@@ -11,7 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="src\CudaTrie\main.cu" />
+    <CudaCompile Include="src\CudaTrie\main.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <CudaCompile Include="src\CudaTrie\trie_cuda.cu" />
     <CudaCompile Include="src\CudaTrie\trie_host.cu" />
   </ItemGroup>
@@ -19,6 +21,19 @@
     <ClInclude Include="include\CudaTrie\trie_common.h" />
     <ClInclude Include="include\CudaTrie\trie_cuda.cuh" />
     <ClInclude Include="include\CudaTrie\trie_host.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="arabic.txt" />
+    <Text Include="dutch.txt" />
+    <Text Include="Filipino-wordlist.txt" />
+    <Text Include="french.txt" />
+    <Text Include="german.txt" />
+    <Text Include="italian.txt" />
+    <Text Include="polish.txt" />
+    <Text Include="portuguese.txt" />
+    <Text Include="serbian.txt" />
+    <Text Include="words.txt" />
+    <Text Include="words_alpha.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FAE7B16B-6FA9-4E4A-8F15-5A4E12872FCB}</ProjectGuid>
@@ -58,6 +73,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -77,6 +94,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

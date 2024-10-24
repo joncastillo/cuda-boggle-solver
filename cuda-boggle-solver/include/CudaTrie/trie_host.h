@@ -29,9 +29,9 @@ public:
 
     std::vector<HostTrieNode> nodes;
 
-    void addWord(const std::string& word);
+    void addWord(const std::wstring& word);
     void buildTrie(size_t maxWordSize);
-    bool searchFromHost(const char* wordToSearch);
+    bool searchFromHost(const std::wstring& wordToSearchUtf8);
 
     HostTrie() : nodes(MAX_CHILDREN),
         maxWordSize(0),

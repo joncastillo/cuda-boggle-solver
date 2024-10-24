@@ -3,6 +3,9 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <codecvt>
+#include <locale>
+
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/copy.h>
@@ -10,24 +13,22 @@
 #include "CudaTrie\trie_host.h"
 #include "CudaTrie\trie_cuda.cuh"
 
+std::u32string wstringToUtf32(const std::wstring& wstr) {
+    std::u32string utf32Str;
+    for (wchar_t wc : wstr) {
+        utf32Str.push_back(static_cast<char32_t>(wc));
+    }
+    return utf32Str;
+}
+
 // Add a word to the host-side Trie
-void HostTrie::addWord(const std::string& word) {
-    std::string wordLowerCased=word;
-
-    std::transform(wordLowerCased.begin(), wordLowerCased.end(), wordLowerCased.begin(), [](unsigned char c) {
-        if (std::isalpha(c)) {
-            return std::tolower(c);
-        }
-        else {
-            return (int)c; // Keep non-alpha characters unchanged
-        }
-        });
-
+void HostTrie::addWord(const std::wstring& word) {
+    std::u32string utf32Word = wstringToUtf32(word); // Convert to UTF-32
     int index = 0;
-    for (const char& c : wordLowerCased) {
+    for (const char32_t& c : utf32Word) {
         int charIndex = charToIndex(c);
         if (charIndex == -1) {
-            std::cerr << "Invalid character in word: " << word << std::endl;
+            std::wcerr << "Invalid character in word: " << word << std::endl;
             return;
         }
 
@@ -64,37 +65,49 @@ void HostTrie::buildTrie(size_t maxWordSize) {
     m_pdev_trieData = thrust::raw_pointer_cast(d_trieData.data());
 }
 
-bool HostTrie::searchFromHost(const char* wordToSearch) {
+bool HostTrie::searchFromHost(const std::wstring& wordToSearchUtf8) {
+    std::u32string wordToSearch = wstringToUtf32(wordToSearchUtf8);
+
     // Run CUDA kernel to test search for word
     bool h_found = false;
     bool* d_found;
-    int d_word_len = static_cast<int>(strlen(wordToSearch));
+    int d_word_len = static_cast<int>(wordToSearch.length());
 
+    // Allocate memory for result on the device
     cudaMalloc((void**)&d_found, sizeof(bool));
-    // Calculate the grid size based on the word length
+
+    // Allocate memory for the word on the device (UTF-32)
+    char32_t* d_word;
+    cudaMalloc((void**)&d_word, d_word_len * sizeof(char32_t));
+
+    std::wcout << "Searching for the word: " << wordToSearchUtf8 << "... ";
+    // Copy the UTF-32 word from host to device
+    cudaMemcpy(d_word, wordToSearch.data(), d_word_len * sizeof(char32_t), cudaMemcpyHostToDevice);
+
+    // Launch the search kernel (adjusted to work with UTF-32)
     int gridSize = (d_word_len + 255) / 256;
-    char* d_word;
-    cudaMalloc((void**)&d_word, d_word_len + 1);
-
-    std::cout << "Searching for the word: " << wordToSearch << "... ";
-    cudaMemcpy(d_word, wordToSearch, d_word_len + 1, cudaMemcpyHostToDevice);
-
     searchTrie << <gridSize, 256 >> > (m_pdev_trieData, d_word, d_found, d_word_len);
     cudaDeviceSynchronize();
+
     cudaError_t error = cudaGetLastError();
     if (error != cudaSuccess) {
         std::cerr << "CUDA Error: " << cudaGetErrorString(error) << std::endl;
         return false;
     }
 
+    // Copy result back from device to host
     cudaMemcpy(&h_found, d_found, sizeof(bool), cudaMemcpyDeviceToHost);
+
     if (h_found) {
         std::cout << "Found!" << std::endl;
     }
     else {
         std::cout << "Not Found!" << std::endl;
     }
+
+    // Free device memory
     cudaFree(d_found);
     cudaFree(d_word);
+
     return h_found;
 }

@@ -5,4 +5,4 @@
 
 __device__ int charToIndex_gpu(char c);
 
-extern __global__ void searchTrie(const int* d_trieData, const char* d_word, bool* d_found, int d_word_len);
+extern __global__ void searchTrie(const int* d_trieData, const char32_t* d_word, bool* d_found, int d_word_len);

@@ -1,37 +1,59 @@
+﻿#include <iostream>
 #include <fstream>
+#include <locale>
+#include <codecvt>
 
 #include "CudaTrie\trie_host.h"
 
-static void initDictionary(HostTrie* dictionary, std::string dictionaryFile) {
-    std::cout << "caching the dictionary..." << std::endl;
-    std::ifstream file(dictionaryFile);
-    std::string line;
+static void initDictionary(std::string dictionaryName, HostTrie* dictionary, std::string dictionaryFile) {
+    std::wifstream file(dictionaryFile);
+    file.imbue(std::locale(file.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
+
+    std::wstring line;
 
     if (file.is_open()) {
+        std::wcout << L"caching the " << std::wstring(dictionaryName.begin(), dictionaryName.end()) << L" dictionary..." << std::endl;
+
         while (getline(file, line)) {
             dictionary->addWord(line);
         }
         file.close();
     }
     else {
-        std::cerr << "Unable to open file" << std::endl;
+        std::wcerr << L"Unable to open file" << std::endl;
     }
 }
 
 int main() {
+#if 0
+    HostTrie dictionaryEnglish;
+    initDictionary("English", & dictionaryEnglish, "./words.txt");
+    dictionaryEnglish.buildTrie(45);
+    dictionaryEnglish.searchFromHost(L"yellow");
+    dictionaryEnglish.searchFromHost(L"stewardesses");
+    dictionaryEnglish.searchFromHost(L"pneumonoultramicroscopicsilicovolcanoconiosis");
+#endif
+    HostTrie dictionaryItalian;
+    initDictionary("Italian", &dictionaryItalian, "./italian.txt");
+    dictionaryItalian.buildTrie(26);
+    dictionaryItalian.searchFromHost(L"precipitevolissimevolmente");
+    dictionaryItalian.searchFromHost(L"epicità");
+    
+    HostTrie dictionaryArabic;
+    initDictionary("Arabic", &dictionaryArabic, "./arabic.txt");
+    dictionaryArabic.buildTrie(10);
+    dictionaryArabic.searchFromHost(L"مستشفى");
 
-    HostTrie trie;
-    initDictionary(&trie, "./words.txt");
-
-    trie.buildTrie(45);
-    trie.searchFromHost("yellow");
-    trie.searchFromHost("stewardesses");
-    trie.searchFromHost("pneumonoultramicroscopicsilicovolcanoconiosis");
 }
 
 
 #if 0
 // download todo:
+https://github.com/kkrypt0nn/wordlists/blob/main/wordlists/languages/
+https://github.com/AustinZuniga/Filipino-wordlist/blob/master/Filipino-wordlist.txt
+https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words.txt
+
+
 static void initDictionary(HostTrie* dictionary, const std::string& dictionaryFile) {
     std::cout << "caching the dictionary..." << std::endl;
     std::ifstream file(dictionaryFile);
