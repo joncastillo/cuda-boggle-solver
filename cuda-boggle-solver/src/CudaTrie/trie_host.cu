@@ -12,7 +12,7 @@
 
 #include "CudaTrie\trie_host.cuh"
 #include "CudaTrie\trie_cuda.cuh"
-#include "Tools\UnicodeTools.hpp"
+#include "Tools\UnicodeTools.cuh"
 
 // Add a word to the host-side Trie
 void HostTrie::addWord(const std::u32string& word) {

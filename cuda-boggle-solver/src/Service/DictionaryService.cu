@@ -1,18 +1,16 @@
 #include <fstream>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 
 #include "Service\DictionaryService.cuh"
 #include "Tools\UnicodeTools.cuh"
 
 DictionaryService::DictionaryService() {
-	initDictionary("English", &dictionaries["English"], "./words.txt");
-	initDictionary("French", &dictionaries["French"], "./french.txt");
-	initDictionary("Italian", &dictionaries["Italian"], "./italian.txt");
-	initDictionary("Spanish", &dictionaries["Spanish"], "./spanish.txt");
+	initDictionary("English", &dictionaries["English"], "./words.txt", 45);
+	initDictionary("French", &dictionaries["French"], "./french.txt", 29);
+	initDictionary("Italian", &dictionaries["Italian"], "./italian.txt", 26);
+	initDictionary("Spanish", &dictionaries["Spanish"], "./spanish.txt", 29);
 }
 
-void DictionaryService::initDictionary(const std::string& dictionaryName, HostTrie* dictionary, const std::string& dictionaryFile) {
+void DictionaryService::initDictionary(const std::string& dictionaryName, HostTrie* dictionary, const std::string& dictionaryFile, int maxWordLength) {
     std::ifstream file(dictionaryFile);
     if (!file.is_open()) {
         std::cerr << "Unable to open file: " << dictionaryFile << std::endl;
@@ -34,6 +32,8 @@ void DictionaryService::initDictionary(const std::string& dictionaryName, HostTr
         }
     }
     file.close();
+
+    dictionary->buildTrie(maxWordLength);
 }
 
 std::string DictionaryService::checkWords(std::string language, std::u32string input) {
@@ -45,23 +45,4 @@ std::string DictionaryService::checkWords(std::string language, std::u32string i
 	else {
         return "";
 	}
-}
-
-// pybind11 module definition
-namespace py = pybind11;
-
-PYBIND11_MODULE(dictionary_service, m) {
-    py::class_<HostTrie>(m, "HostTrie");
-
-    // Expose DictionaryService as a singleton with the get_instance method
-    py::class_<DictionaryService>(m, "DictionaryService")
-        .def_static("get_instance", &DictionaryService::get_instance, py::return_value_policy::reference)
-        .def("check_words",
-            [](DictionaryService& self, const std::string& language, const py::str& input) {
-                std::u32string u32input = input.cast<std::u32string>();
-                return self.checkWords(language, u32input);
-            },
-            py::arg("language"),
-            py::arg("input"),
-            "Check words in the specified language's dictionary");
 }

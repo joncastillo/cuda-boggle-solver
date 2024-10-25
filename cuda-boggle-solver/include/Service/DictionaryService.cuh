@@ -7,7 +7,7 @@
 class DictionaryService {
     std::map<std::string, HostTrie> dictionaries;
     DictionaryService();
-    void initDictionary(const std::string& dictionaryName, HostTrie* dictionary, const std::string& dictionaryFile);
+    void initDictionary(const std::string& dictionaryName, HostTrie* dictionary, const std::string& dictionaryFile, int maxWordLength);
 
 
 public:

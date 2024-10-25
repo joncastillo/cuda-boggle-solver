@@ -1,0 +1,11 @@
+/.vs/*
+/cuda-boggle-solver-python-server/.idea/*
+/cuda-boggle-solver-python-server/dictionary_service.pyd
+/code_dump.txt
+/cuda-boggle-solver/cuda-boggle-solver.vcxproj.user
+/cuda-boggle-solver/x64/*
+/Lib/site-packages/*
+/x64/*
+/Scripts/activate
+/Scripts/*
+/pyvenv.cfg
