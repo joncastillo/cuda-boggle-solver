@@ -10,7 +10,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/copy.h>
 
-#include "CudaTrie\trie_host.h"
+#include "CudaTrie\trie_host.cuh"
 #include "CudaTrie\trie_cuda.cuh"
 #include "Tools\UnicodeTools.hpp"
 
@@ -108,4 +108,80 @@ bool HostTrie::searchFromHost(const std::u32string& wordToSearchUtf32) {
     cudaFree(d_word);
 
     return h_found;
+}
+
+// Helper function to tokenize the paragraph into words (UTF-32)
+std::vector<std::u32string> tokenizeParagraph(const std::u32string& paragraph) {
+    std::vector<std::u32string> words;
+    std::u32string currentWord;
+
+    for (char32_t c : paragraph) {
+        if (c == U' ' || c == U'\t' || c == U'\n' || c == U'\r' || c == U',' || c == U'.') {
+            if (!currentWord.empty()) {
+                words.push_back(currentWord);
+                currentWord.clear();
+            }
+        }
+        else {
+            currentWord.push_back(c);
+        }
+    }
+
+    // Add the last word if the string doesn't end with a delimiter
+    if (!currentWord.empty()) {
+        words.push_back(currentWord);
+    }
+
+    return words;
+}
+
+std::string HostTrie::searchFromHostParagraph(const std::u32string& paragraph) {
+    // Tokenize the paragraph into individual words
+    std::vector<std::u32string> words = tokenizeParagraph(paragraph);
+    std::string result;
+
+    for (const std::u32string& wordToSearchUtf32 : words) {
+        bool h_found = false;
+        bool* d_found;
+        int d_word_len = static_cast<int>(wordToSearchUtf32.length());
+
+        // Allocate memory for result on the device
+        cudaMalloc((void**)&d_found, sizeof(bool));
+
+        // Allocate memory for the word on the device (UTF-32)
+        char32_t* d_word;
+        cudaMalloc((void**)&d_word, d_word_len * sizeof(char32_t));
+
+        // Copy the UTF-32 word from host to device
+        cudaMemcpy(d_word, wordToSearchUtf32.data(), d_word_len * sizeof(char32_t), cudaMemcpyHostToDevice);
+
+        // Launch the search kernel (adjusted to work with UTF-32)
+        int gridSize = (d_word_len + 255) / 256;
+        searchTrie << < gridSize, 256 >> > (m_pdev_trieData, d_word, d_found, d_word_len);
+        cudaDeviceSynchronize();
+
+        cudaError_t error = cudaGetLastError();
+        if (error != cudaSuccess) {
+            std::cerr << "CUDA Error: " << cudaGetErrorString(error) << std::endl;
+            return "";
+        }
+
+        // Copy result back from device to host
+        cudaMemcpy(&h_found, d_found, sizeof(bool), cudaMemcpyDeviceToHost);
+
+        // Add the result (1 for found, 0 for not found) to the output string
+        result += (h_found ? "1" : "0");
+        result += ",";
+
+        // Free device memory
+        cudaFree(d_found);
+        cudaFree(d_word);
+    }
+
+    // Remove the last comma
+    if (!result.empty()) {
+        result.pop_back();
+    }
+
+    return result;
 }
