@@ -1,13 +1,14 @@
-#include <fstream>
+﻿#include <fstream>
 
 #include "Service\DictionaryService.cuh"
 #include "Tools\UnicodeTools.cuh"
 
 DictionaryService::DictionaryService() {
-	initDictionary("English", &dictionaries["English"], "./words.txt", 45);
-	initDictionary("French", &dictionaries["French"], "./french.txt", 29);
-	initDictionary("Italian", &dictionaries["Italian"], "./italian.txt", 26);
-	initDictionary("Spanish", &dictionaries["Spanish"], "./spanish.txt", 29);
+	initDictionary("English", &dictionaries["English"], "./words.txt", 45);   //pneumonoultramicroscopicsilicovolcanoconiosis
+	initDictionary("French", &dictionaries["French"], "./french.txt", 29);    //anticonstitutionnellement
+	initDictionary("Italian", &dictionaries["Italian"], "./italian.txt", 26); //precipitevolissimevolmente
+	initDictionary("Spanish", &dictionaries["Spanish"], "./spanish.txt", 22); //esternocleidomastoideo
+    initDictionary("Russian", &dictionaries["Russian"], "./russian.txt", 31); //превысокомногорассмотрительствующий
 }
 
 void DictionaryService::initDictionary(const std::string& dictionaryName, HostTrie* dictionary, const std::string& dictionaryFile, int maxWordLength) {
