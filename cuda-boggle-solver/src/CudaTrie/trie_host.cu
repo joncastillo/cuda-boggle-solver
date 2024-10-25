@@ -12,23 +12,22 @@
 
 #include "CudaTrie\trie_host.h"
 #include "CudaTrie\trie_cuda.cuh"
-
-std::u32string wstringToUtf32(const std::wstring& wstr) {
-    std::u32string utf32Str;
-    for (wchar_t wc : wstr) {
-        utf32Str.push_back(static_cast<char32_t>(wc));
-    }
-    return utf32Str;
-}
+#include "Tools\UnicodeTools.hpp"
 
 // Add a word to the host-side Trie
-void HostTrie::addWord(const std::wstring& word) {
-    std::u32string utf32Word = wstringToUtf32(word); // Convert to UTF-32
+void HostTrie::addWord(const std::u32string& word) {
     int index = 0;
-    for (const char32_t& c : utf32Word) {
+    for (const char32_t& c : word) {
+
+        // Ignore control characters like LRM (U+200E)
+        if (c == U'\u200E' || c == U'\u200F') {
+            continue; // Skip Left-to-Right Mark (U+200E) and Right-to-Left Mark (U+200F)
+        }
+
+
         int charIndex = charToIndex(c);
         if (charIndex == -1) {
-            std::wcerr << "Invalid character in word: " << word << std::endl;
+            std::wcerr << L"Invalid character in word: " << utf32ToWstring(word) << std::endl;
             return;
         }
 
@@ -65,13 +64,12 @@ void HostTrie::buildTrie(size_t maxWordSize) {
     m_pdev_trieData = thrust::raw_pointer_cast(d_trieData.data());
 }
 
-bool HostTrie::searchFromHost(const std::wstring& wordToSearchUtf8) {
-    std::u32string wordToSearch = wstringToUtf32(wordToSearchUtf8);
+bool HostTrie::searchFromHost(const std::u32string& wordToSearchUtf32) {
 
     // Run CUDA kernel to test search for word
     bool h_found = false;
     bool* d_found;
-    int d_word_len = static_cast<int>(wordToSearch.length());
+    int d_word_len = static_cast<int>(wordToSearchUtf32.length());
 
     // Allocate memory for result on the device
     cudaMalloc((void**)&d_found, sizeof(bool));
@@ -80,9 +78,9 @@ bool HostTrie::searchFromHost(const std::wstring& wordToSearchUtf8) {
     char32_t* d_word;
     cudaMalloc((void**)&d_word, d_word_len * sizeof(char32_t));
 
-    std::wcout << "Searching for the word: " << wordToSearchUtf8 << "... ";
+    std::wcout << "Searching for the word: " << utf32ToWstring(wordToSearchUtf32) << "... ";
     // Copy the UTF-32 word from host to device
-    cudaMemcpy(d_word, wordToSearch.data(), d_word_len * sizeof(char32_t), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_word, wordToSearchUtf32.data(), d_word_len * sizeof(char32_t), cudaMemcpyHostToDevice);
 
     // Launch the search kernel (adjusted to work with UTF-32)
     int gridSize = (d_word_len + 255) / 256;

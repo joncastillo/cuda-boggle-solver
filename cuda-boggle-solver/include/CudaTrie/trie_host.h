@@ -29,11 +29,11 @@ public:
 
     std::vector<HostTrieNode> nodes;
 
-    void addWord(const std::wstring& word);
+    void addWord(const std::u32string& word);
     void buildTrie(size_t maxWordSize);
-    bool searchFromHost(const std::wstring& wordToSearchUtf8);
+    bool searchFromHost(const std::u32string& wordToSearchUtf32);
 
-    HostTrie() : nodes(MAX_CHILDREN),
-        maxWordSize(0),
-        m_pdev_trieData(nullptr) {}
+    HostTrie() : maxWordSize(0), m_pdev_trieData(nullptr) {
+        nodes.push_back(HostTrieNode());  // Add root node
+    }
 };
