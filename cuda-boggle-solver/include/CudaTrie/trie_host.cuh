@@ -32,6 +32,7 @@ public:
 
     void addWord(const std::u32string& word);
     void buildTrie(size_t maxWordSize);
+    void destroyTrie();
     bool searchFromHost(const std::u32string& wordToSearchUtf32);
     void collectWords(const HostTrie& trie, int nodeIndex, std::u32string currentWord, std::unordered_set<std::u32string>& words);
     std::string searchFromHostParagraph(const std::u32string& paragraph);

@@ -11,3 +11,4 @@ extern std::string logicalXorStrings(const std::string& str1, const std::string&
 extern std::string logicalNotString(const std::string& input);
 extern std::vector<std::u32string> splitU32StringToWords(const std::u32string& input);
 extern std::vector<std::u32string> filterWordsByBoolean(const std::u32string& utf32Str, const std::string& boolCsv);
+extern double getAccuracyFromBooleanMask(const std::string& boolCsv);

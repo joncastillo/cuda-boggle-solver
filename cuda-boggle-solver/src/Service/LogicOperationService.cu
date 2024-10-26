@@ -27,3 +27,6 @@ std::vector<std::u32string> LogicOperationService::splitU32StringToWords(const s
 std::vector<std::u32string> LogicOperationService::filterWordsByBoolean(const std::u32string& utf32Str, const std::string& boolCsv) {
 	return ::filterWordsByBoolean(utf32Str, boolCsv);
 }
+double LogicOperationService::getAccuracyFromBooleanMask(const std::string& boolCsv) {
+	return ::getAccuracyFromBooleanMask(boolCsv);
+}

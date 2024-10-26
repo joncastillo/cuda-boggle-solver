@@ -15,4 +15,5 @@ public:
     std::string logicalNotString(const std::string& input);
     std::vector<std::u32string> splitU32StringToWords(const std::u32string& input);
     std::vector<std::u32string> filterWordsByBoolean(const std::u32string& utf32Str, const std::string& boolCsv);
+    double getAccuracyFromBooleanMask(const std::string& boolCsv);
 };

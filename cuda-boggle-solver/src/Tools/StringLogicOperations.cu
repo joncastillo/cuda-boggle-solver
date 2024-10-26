@@ -129,3 +129,14 @@ std::vector<std::u32string> filterWordsByBoolean(const std::u32string& utf32Str,
 
     return result;
 }
+
+double getAccuracyFromBooleanMask(const std::string& boolCsv) {
+    std::vector<int> vec = splitStringToVector(boolCsv);
+    size_t count_one = 0;
+    for (auto aBool : vec) {
+        if (aBool == 1) {
+            count_one++;
+        }
+    }
+    return (double)count_one / vec.size();
+}

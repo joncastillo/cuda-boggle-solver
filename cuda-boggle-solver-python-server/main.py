@@ -35,6 +35,98 @@ def check_and_download_files():
         download_file(url, file_paths[language])
 
 
+@app.route('/create_custom_dictionary', methods=['POST'])
+def create_custom_dictionary():
+    """
+    Create a new custom Trie-based dictionary. This uses CUDA on the backend to speed up searches on verify words on large text corpuses. You will need to call Populate_Dictionary to store words. IMPORTANT: Make sure to destroy_custom_dictionary after use to avoid memory congestion.
+
+    - **URL**: `/create_custom_dictionary`
+    - **Method**: `POST`
+    - **Request JSON**:
+        - `dictionary` (str): The name of the custom dictionary.
+    - **Response JSON**:
+        - `result` (str): status message.
+    """
+    data = request.get_json()
+    dictionary = data.get("dictionary")
+
+    result = dictionary_service_instance.create_custom_dictionary(language, text)
+    return jsonify({"result": "OK"})
+
+@app.route('/destroy_custom_dictionary', methods=['POST'])
+def destroy_custom_dictionary():
+    """
+    Create a new custom Trie-based dictionary. This uses CUDA on the backend to speed up searches on verify words on large text corpuses. You will need to call Populate_Dictionary to store words. IMPORTANT: Make sure to destroy_custom_dictionary after use to avoid memory congestion.
+
+    - **URL**: `/destroy_custom_dictionary`
+    - **Method**: `POST`
+    - **Request JSON**:
+        - `dictionary` (str): The name of the custom dictionary.
+    - **Response JSON**:
+        - `result` (str): status message.
+    """
+    data = request.get_json()
+    dictionary = data.get("dictionary")
+
+    result = dictionary_service_instance.destroy_custom_dictionary(language, text)
+    return jsonify({"result": "OK"})
+
+@app.route('/populate_dictionary', methods=['POST'])
+def populate_dictionary():
+    """
+    Add words to a custom dictionary. The wordlist should be a string containing space-separated words. Most unicode characters are allowed.
+
+    - **URL**: `/destroy_custom_dictionary`
+    - **Method**: `POST`
+    - **Request JSON**:
+        - `dictionary` (str): The name of the custom dictionary.
+        - `wordlist` (str): lsit of words to store in the custom dictionary.
+    - **Response JSON**:
+        - `result` (str): status message.
+    """
+    data = request.get_json()
+    dictionary = data.get("dictionary")
+    wordlist = data.get("wordlist")
+    result = dictionary_service_instance.populate_dictionary(dictionary, wordlist)
+    return jsonify({"result": "OK"})
+
+@app.route('/similarity_check_of_two_dictionaries', methods=['POST'])
+def similarity_check_of_two_dictionaries():
+    """
+    How similar are two dictionaries. Uses the formula log (common_words+1) / log (unique_words+1)
+
+    - **URL**: `/calculate_text_integrity_from_bitmask`
+    - **Method**: `POST`
+    - **Request JSON**:
+        - `dictionary1` (str): Name of the first dictionary
+        - `dictionary2` (str): Name of the second dictionary
+    - **Response JSON**:
+        - `result` (number): The estimated percentage similarity of the two dictionaries.
+    """
+    data = request.get_json()
+    dictionary1 = data.get("dictionary1")
+    dictionary2 = data.get("dictionary2")
+    result = dictionary_service_instance.similarity_check_of_two_dictionaries(dictionary1, dictionary2)
+    return jsonify({"result": result * 100})
+
+@app.route('/similarity_check_of_two_texts', methods=['POST'])
+def similarity_check_of_two_dictionaries():
+    """
+    How similar are two texts. Uses the formula log (common_characters+1) / log (unique_characters+1)
+
+    - **URL**: `/calculate_text_integrity_from_bitmask`
+    - **Method**: `POST`
+    - **Request JSON**:
+        - `text1` (str): Name of the first dictionary
+        - `text2` (str): Name of the second dictionary
+    - **Response JSON**:
+        - `result` (number): The estimated percentage similarity of the two texts.
+    """
+    data = request.get_json()
+    text1 = data.get("text1")
+    text2 = data.get("text2")
+    result = dictionary_service_instance.similarity_check_of_two_texts(text1, text2)
+    return jsonify({"result": result * 100})
 
 @app.route('/verify_words', methods=['POST'])
 def verify_words():
@@ -148,6 +240,24 @@ def filter_words():
     boolean_csv = data.get("mask")
     words = logic_operation_service_instance.filterWordsByBoolean(text, boolean_csv)
     return jsonify({"result": [str(word) for word in words]})
+
+@app.route('/calculate_bitmask_relevance', methods=['POST'])
+def calculate_bitmask_accuracy():
+    """
+    Calculates the number of 1's and divide that by the total number of elements. This estimates the percentage relevance of the bitmask.
+
+    - **URL**: `/calculate_text_integrity_from_bitmask`
+    - **Method**: `POST`
+    - **Request JSON**:
+        - `bitmask` (str): A string of comma separated ones and zeroes.
+    - **Response JSON**:
+        - `result` (number): The estimated percentage relevance of the bitmask.
+    """
+    data = request.get_json()
+    bitmask = data.get("bitmask")
+    result = dictionary_service_instance.calculate_bitmask_accuracy(bitmask)
+    return jsonify({"result": result * 100})
+
 
 if __name__ == '__main__':
     check_and_download_files()

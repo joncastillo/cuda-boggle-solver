@@ -75,10 +75,22 @@ void DictionaryService::populateDictionary(const std::string& dictionaryName, co
             it->second.addWord(currentWord);
         }
     }
+    it->second.buildTrie(it->second.maxWordSize);
+}
+
+void DictionaryService::buildTrie(const std::string& dictionaryName) {
+    auto it = dictionaries.find(dictionaryName);
+    if (it != dictionaries.end()) {
+        it->second.buildTrie(it->second.maxWordSize);
+    }
 }
 
 
 void DictionaryService::deleteDictionary(const std::string& dictionaryName) {
+    auto it = dictionaries.find(dictionaryName);
+    if (it != dictionaries.end()) {
+        it->second.destroyTrie();
+    }
     dictionaries.erase(dictionaryName);
 }
 

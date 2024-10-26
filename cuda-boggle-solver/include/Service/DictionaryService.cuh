@@ -26,6 +26,7 @@ public:
     std::string checkWords(std::string language, std::u32string input);
     void createDictionary(const std::string& dictionaryName, int maxWordLength);
     void populateDictionary(const std::string& dictionaryName, const std::u32string& spaceSeparatedWords);
+    void buildTrie(const std::string& dictionaryName);
     void deleteDictionary(const std::string& dictionaryName);
     std::u32string obtainWords(const std::u32string& text);
     std::unordered_set<std::u32string> DictionaryService::collectWords(std::string dictionary);
