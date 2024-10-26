@@ -65,8 +65,8 @@ int main() {
 
     std::cout << "Probability by common words:   " << probability1 * 100 << "%." << std::endl;
     std::cout << "Probability by common symbols: " << probability2 * 100 << "%." << std::endl;
-    system("pause");
-#if 0
+
+#if 1
 
     std::cout << dictionaryService.checkWords("English", U"yellow stewardesses pneumonoultramicroscopicsilicovolcanoconiosis") << std::endl;
     std::cout << dictionaryService.checkWords("Italian", U"precipitevolissimevolmente epicità") << std::endl;
@@ -74,7 +74,7 @@ int main() {
     std::cout << dictionaryService.checkWords("Spanish", U"querido misericordiosamente") << std::endl;
 
     HostTrie dictionaryArabic;
-    initDictionary("Arabic", &dictionaryArabic, "./arabic2.txt");
+    initDictionary("Arabic", &dictionaryArabic, "./arabic.txt");
     dictionaryArabic.buildTrie(10);
     std::u32string arabicHospital = { 0x0645, 0x0633, 0x062A, 0x0634, 0x0641, 0x0649 }; //مستشفى
     std::u32string arabicStewardess = { 0x0645, 0x0636, 0x064A, 0x0641, 0x0629 }; // مضيفة
@@ -99,5 +99,5 @@ int main() {
     }
     std::wcout << std::endl;
 #endif 
-
+    system("pause");
 }

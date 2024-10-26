@@ -5,111 +5,143 @@
 
 // Function to map a character to an index
 inline char32_t idxToChar(int index) {
-    if (index >= 0 && index <= 25) {
-        return U'a' + index; // English lowercase letters (a-z)
-    }
-    else if (index >= 26 && index <= 35) {
-        return U'0' + (index - 26); // Digits (0-9)
-    }
+    int baseIndex = 0;
 
-    switch (index) {
-    case 36: return U'-';
-    case 37: return U'.';
-    case 38: return U'/';
-    case 39: return U'\'';
-    case 40: return U',';
-    case 41: return U'&';
-    case 42: return U'!';
-    case 43: return U'#';
+    if (index >= baseIndex && index < baseIndex + 26) {
+        return U'a' + (index - baseIndex);
     }
+    baseIndex += 26;
 
-    if (index >= 300 && index <= 395) {
-        return U'\u00A0' + (index - 300); // Latin-1 Supplement
+    if (index >= baseIndex && index < baseIndex + 10) {
+        return U'0' + (index - baseIndex);
     }
-    else if (index >= 396 && index <= 519) {
-        return U'\u0100' + (index - 396); // Latin Extended-A
-    }
-    else if (index >= 520 && index <= 696) {
-        return U'\u0180' + (index - 520); // Latin Extended-B
-    }
-    else if (index >= 697 && index <= 952) {
-        return U'\u0400' + (index - 697); // Cyrillic Unicode block
-    }
-    else if (index >= 953 && index <= 982) {
-        return U'\u0750' + (index - 953); // Arabic Supplement
-    }
-    else if (index >= 983 && index <= 1212) {
-        return U'\uFB50' + (index - 983); // Arabic Presentation Forms-A
-    }
-    else if (index >= 1213 && index <= 1242) {
-        return U'\uFE70' + (index - 1213); // Arabic Presentation Forms-B
-    }
+    baseIndex += 10;
 
-    return U'\0'; // Invalid index
+    if (index >= baseIndex && index < baseIndex + 8) {
+        switch (index - baseIndex) {
+        case 0: return U'-';
+        case 1: return U'.';
+        case 2: return U'/';
+        case 3: return U'\'';
+        case 4: return U',';
+        case 5: return U'&';
+        case 6: return U'!';
+        case 7: return U'#';
+        }
+    }
+    baseIndex += 8;
+
+    if (index >= baseIndex && index < baseIndex + (0x06FF - 0x0600 + 1)) {
+        return U'\u0600' + (index - baseIndex);
+    }
+    baseIndex += (0x06FF - 0x0600 + 1);
+
+    if (index >= baseIndex && index < baseIndex + (0x077F - 0x0750 + 1)) {
+        return U'\u0750' + (index - baseIndex);
+    }
+    baseIndex += (0x077F - 0x0750 + 1);
+
+    if (index >= baseIndex && index < baseIndex + (0xFDFF - 0xFB50 + 1)) {
+        return U'\uFB50' + (index - baseIndex);
+    }
+    baseIndex += (0xFDFF - 0xFB50 + 1);
+
+    if (index >= baseIndex && index < baseIndex + (0xFEFF - 0xFE70 + 1)) {
+        return U'\uFE70' + (index - baseIndex);
+    }
+    baseIndex += (0xFEFF - 0xFE70 + 1);
+
+    if (index >= baseIndex && index < baseIndex + (0x00FF - 0x00A0 + 1)) {
+        return U'\u00A0' + (index - baseIndex);
+    }
+    baseIndex += (0x00FF - 0x00A0 + 1);
+
+    if (index >= baseIndex && index < baseIndex + (0x017F - 0x0100 + 1)) {
+        return U'\u0100' + (index - baseIndex);
+    }
+    baseIndex += (0x017F - 0x0100 + 1);
+
+    if (index >= baseIndex && index < baseIndex + (0x024F - 0x0180 + 1)) {
+        return U'\u0180' + (index - baseIndex);
+    }
+    baseIndex += (0x024F - 0x0180 + 1);
+
+    if (index >= baseIndex && index < baseIndex + (0x04FF - 0x0400 + 1)) {
+        return U'\u0400' + (index - baseIndex);
+    }
+    baseIndex += (0x04FF - 0x0400 + 1);
+
+    return U'\uFFFD'; // Return the Unicode replacement character for invalid index
 }
 
 inline int charToIndex(char32_t c) {
-    // Convert uppercase to lowercase if necessary
+    int index = 0;
+
     if (c >= U'A' && c <= U'Z') {
-        c = c + (U'a' - U'A'); // Convert uppercase to lowercase
+        c = c + (U'a' - U'A');
     }
 
-    // Handle lowercase English letters (a-z)
     if (c >= U'a' && c <= U'z') {
-        return c - U'a'; // English lowercase letters mapped to 0-25
+        return index + (c - U'a');
     }
+    index += 26;
 
-    // Handle digits (0-9)
     if (c >= U'0' && c <= U'9') {
-        return 26 + (c - U'0'); // Digits mapped to 26-35
+        return index + (c - U'0');
     }
+    index += 10;
 
-    // Handle specific symbols: '-', '.', '/', '\'', ',', '&', '!', '#'
     switch (c) {
-    case U'-': return 36;
-    case U'.': return 37;
-    case U'/': return 38;
-    case U'\'': return 39;
-    case U',': return 40;
-    case U'&': return 41;
-    case U'!': return 42;
-    case U'#': return 43;
+    case U'-': return index;
+    case U'.': return index + 1;
+    case U'/': return index + 2;
+    case U'\'': return index + 3;
+    case U',': return index + 4;
+    case U'&': return index + 5;
+    case U'!': return index + 6;
+    case U'#': return index + 7;
     }
+    index += 8;
 
-    // Latin-1 Supplement (U+00A0 to U+00FF)
-    if (c >= U'\u00A0' && c <= U'\u00FF') {
-        return 300 + (c - U'\u00A0');
+    if (c >= U'\u0600' && c <= U'\u06FF') {
+        return index + (c - U'\u0600');
     }
+    index += (0x06FF - 0x0600 + 1);
 
-    // Latin Extended-A (U+0100 to U+017F)
-    if (c >= U'\u0100' && c <= U'\u017F') {
-        return 396 + (c - U'\u0100');
-    }
-
-    // Latin Extended-B (U+0180 to U+024F)
-    if (c >= U'\u0180' && c <= U'\u024F') {
-        return 520 + (c - U'\u0180');
-    }
-
-    // Cyrillic Unicode block (U+0400 to U+04FF)
-    if (c >= U'\u0400' && c <= U'\u04FF') {
-        return 697 + (c - U'\u0400');
-    }
-
-    // Arabic Supplement (U+0750 to U+077F)
     if (c >= U'\u0750' && c <= U'\u077F') {
-        return 953 + (c - U'\u0750');
+        return index + (c - U'\u0750');
     }
+    index += (0x077F - 0x0750 + 1);
 
-    // Arabic Presentation Forms-A (U+FB50 to U+FDFF)
     if (c >= U'\uFB50' && c <= U'\uFDFF') {
-        return 983 + (c - U'\uFB50');
+        return index + (c - U'\uFB50');
     }
+    index += (0xFDFF - 0xFB50 + 1);
 
-    // Arabic Presentation Forms-B (U+FE70 to U+FEFF)
     if (c >= U'\uFE70' && c <= U'\uFEFF') {
-        return 1213 + (c - U'\uFE70');
+        return index + (c - U'\uFE70');
     }
+    index += (0xFEFF - 0xFE70 + 1);
 
-    return -1; // Invalid character
+    if (c >= U'\u00A0' && c <= U'\u00FF') {
+        return index + (c - U'\u00A0');
+    }
+    index += (0x00FF - 0x00A0 + 1);
+
+    if (c >= U'\u0100' && c <= U'\u017F') {
+        return index + (c - U'\u0100');
+    }
+    index += (0x017F - 0x0100 + 1);
+
+    if (c >= U'\u0180' && c <= U'\u024F') {
+        return index + (c - U'\u0180');
+    }
+    index += (0x024F - 0x0180 + 1);
+
+    if (c >= U'\u0400' && c <= U'\u04FF') {
+        return index + (c - U'\u0400');
+    }
+    index += (0x04FF - 0x0400 + 1);
+
+    return -1;
 }
