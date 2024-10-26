@@ -5,6 +5,7 @@
 #include <vector>
 #include <codecvt>
 #include <locale>
+#include <unordered_set>
 
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
@@ -23,7 +24,6 @@ void HostTrie::addWord(const std::u32string& word) {
         if (c == U'\u200E' || c == U'\u200F') {
             continue; // Skip Left-to-Right Mark (U+200E) and Right-to-Left Mark (U+200F)
         }
-
 
         int charIndex = charToIndex(c);
         if (charIndex == -1) {
@@ -184,4 +184,31 @@ std::string HostTrie::searchFromHostParagraph(const std::u32string& paragraph) {
     }
 
     return result;
+}
+
+void HostTrie::collectWords_i(int nodeIndex, std::u32string currentWord, std::unordered_set<std::u32string>& words) {
+    const HostTrieNode& node = nodes[nodeIndex];
+
+    if (node.isWordEnd) {
+        words.insert(currentWord);
+    }
+
+    if (currentWord.size() >= maxWordSize) {
+        return; // Stop if we've reached maxWordSize
+    }
+
+    for (int i = 0; i < MAX_CHILDREN; ++i) {
+        int childIndex = node.children[i];
+        if (childIndex != -1) { // If there is a valid child at this position
+            char32_t character = idxToChar(i); // Map index to character using indexToChar
+            currentWord.push_back(character);
+            collectWords_i(childIndex, currentWord, words);
+            currentWord.pop_back();
+        }
+    }
+}
+
+void HostTrie::collectWords(std::unordered_set<std::u32string>& words) {
+    // Starts collecting words from the root node with an empty current word
+    collectWords_i(0, U"", words);
 }

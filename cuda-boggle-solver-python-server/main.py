@@ -20,13 +20,16 @@ def check_and_download_files():
         "english": "https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words.txt",
         "french": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/french.txt",
         "italian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/italian.txt",
-        "spanish": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/spanish.txt"
+        "spanish": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/spanish.txt",
+        "russian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/russian.txt"
     }
     file_paths = {
         "english": "./words.txt",
         "french": "./french.txt",
         "italian": "./italian.txt",
-        "spanish": "./spanish.txt"
+        "spanish": "./spanish.txt",
+        "russian": "./russian.txt",
+
     }
     for language, url in word_urls.items():
         download_file(url, file_paths[language])
@@ -41,14 +44,14 @@ def verify_words():
     - **URL**: `/verify_words`
     - **Method**: `POST`
     - **Request JSON**:
-        - `input1` (str): The text to check.
-        - `input2` (str): The language of the text (e.g., "english").
+        - `text` (str): The text to check.
+        - `language` (str): The language of the text. Supports "Russian", "English", "Spanish", "Italian" and "French".
     - **Response JSON**:
         - `result` (str): A CSV string of booleans indicating the presence of each word in the language dictionary.
     """
     data = request.get_json()
-    text = data.get("input1")
-    language = data.get("input2")
+    text = data.get("text")
+    language = data.get("language")
 
     result = dictionary_service_instance.check_words(language, text)
     return jsonify({"result": result})
@@ -135,14 +138,14 @@ def filter_words():
     - **URL**: `/filter_words`
     - **Method**: `POST`
     - **Request JSON**:
-        - `input1` (str): The text to filter.
-        - `input2` (str): A CSV string of booleans indicating which words to keep.
+        - `text` (str): The text to filter.
+        - `mask` (str): A CSV string of booleans indicating which words to keep.
     - **Response JSON**:
         - `result` (list): A list of filtered words that matched the boolean CSV string.
     """
     data = request.get_json()
-    text = data.get("input1")
-    boolean_csv = data.get("input2")
+    text = data.get("text")
+    boolean_csv = data.get("mask")
     words = logic_operation_service_instance.filterWordsByBoolean(text, boolean_csv)
     return jsonify({"result": [str(word) for word in words]})
 
@@ -154,3 +157,4 @@ if __name__ == '__main__':
     logic_operation_service_instance = dictionary_service.LogicOperationService.get_instance()
 
     app.run(debug=False)
+    

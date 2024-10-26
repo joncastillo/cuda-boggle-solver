@@ -36,9 +36,6 @@
     <Text Include="arabic_simple.txt" />
     <Text Include="dutch.txt" />
     <Text Include="Filipino-wordlist.txt" />
-    <Text Include="french.txt" />
-    <Text Include="german.txt" />
-    <Text Include="italian.txt" />
     <Text Include="polish.txt" />
     <Text Include="portuguese.txt" />
     <Text Include="serbian.txt" />
@@ -121,12 +118,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)include;$(PYTHONHOME)\include;$(PYTHONHOME)\Lib\site-packages\pybind11\include;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
