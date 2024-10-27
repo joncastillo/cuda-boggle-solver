@@ -1,0 +1,217 @@
+[
+    {
+        "name": "create_custom_dictionary",
+        "description": "Create a new custom Trie-based dictionary. This uses CUDA on the backend to speed up searches on large text corpuses. You will need to call Populate_Dictionary to store words. IMPORTANT: Make sure to destroy_custom_dictionary to free resources and stop charges.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "dictionary": {
+                    "type": "string",
+                    "description": "The name of the custom dictionary.",
+                    "default": null
+                },
+                "maxWordLength": {
+                    "type": "number",
+                    "description": "The maximum length of a word for this dictionary. Defaults to 20.",
+                    "default": 20
+                }
+            },
+            "required": [
+                "dictionary"
+            ],
+            "optional": [
+                "maxWordLength"
+            ]
+        }
+    },
+    {
+        "name": "destroy_custom_dictionary",
+        "description": "Destroys the dictionary from the server.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "dictionary": {
+                    "type": "string",
+                    "description": "The name of the custom dictionary.",
+                    "default": null
+                }
+            },
+            "required": [
+                "dictionary"
+            ],
+            "optional": []
+        }
+    },
+    {
+        "name": "populate_dictionary",
+        "description": "Add words to a custom dictionary. The wordlist should be a string containing space-separated words. Most unicode characters are allowed.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "dictionary": {
+                    "type": "string",
+                    "description": "The name of the custom dictionary.",
+                    "default": null
+                },
+                "wordlist": {
+                    "type": "string",
+                    "description": "List of words to store in the custom dictionary.",
+                    "default": null
+                }
+            },
+            "required": [
+                "dictionary",
+                "wordlist"
+            ],
+            "optional": []
+        }
+    },
+    {
+        "name": "obtain_words",
+        "description": "Obtain words from a given text for use in populate_dictionary. This returns a list of words in the form of a space-separated string.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "The text to check.",
+                    "default": null
+                }
+            },
+            "required": [
+                "text"
+            ],
+            "optional": []
+        }
+    },
+    {
+        "name": "similarity_check_of_two_dictionaries",
+        "description": "How similar are two dictionaries? Uses the formula log (common_words+1) / log (unique_words+1)",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "dictionary1": {
+                    "type": "string",
+                    "description": "Name of the first dictionary",
+                    "default": null
+                },
+                "dictionary2": {
+                    "type": "string",
+                    "description": "Name of the second dictionary",
+                    "default": null
+                }
+            },
+            "required": [
+                "dictionary1",
+                "dictionary2"
+            ],
+            "optional": []
+        }
+    },
+    {
+        "name": "similarity_check_of_two_texts",
+        "description": "How similar are two texts? Uses the formula log (common_characters+1) / log (unique_characters+1)",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "text1": {
+                    "type": "string",
+                    "description": "Name of the first text",
+                    "default": null
+                },
+                "text2": {
+                    "type": "string",
+                    "description": "Name of the second text",
+                    "default": null
+                }
+            },
+            "required": [
+                "text1",
+                "text2"
+            ],
+            "optional": []
+        }
+    },
+    {
+        "name": "verify_words",
+        "description": "Verify words in a given text for a specified language. Returns a CSV string of booleans indicating the presence of each word in the language dictionary.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "The text to check.",
+                    "default": null
+                },
+                "dictionary": {
+                    "type": "string",
+                    "description": "The dictionary to use. Supports \"Russian\", \"English\", \"Spanish\", \"Italian\", \"French\" and custom dictionaries.",
+                    "default": null
+                }
+            },
+            "required": [
+                "text",
+                "dictionary"
+            ],
+            "optional": []
+        }
+    },
+    {
+        "name": "filter_words",
+        "description": "Filter words in a text based on a CSV boolean string. Returns a list of filtered words that matched the boolean CSV string.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "The text to filter.",
+                    "default": null
+                },
+                "mask": {
+                    "type": "string",
+                    "description": "A CSV string of booleans indicating which words to keep.",
+                    "default": null
+                }
+            },
+            "required": [
+                "text",
+                "mask"
+            ],
+            "optional": []
+        }
+    },
+    {
+        "name": "calculate_bitmask_relevance",
+        "description": "Calculates the number of 1's and divides that by the total number of elements. This estimates the percentage relevance of the bitmask.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "bitmask": {
+                    "type": "string",
+                    "description": "A string of comma-separated ones and zeroes.",
+                    "default": null
+                }
+            },
+            "required": [],
+            "optional": []
+        }
+    },
+    {
+        "name": "logical_not",
+        "description": "Perform logical NOT on a CSV string of booleans.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "description": "A CSV string of booleans.",
+                    "default": null
+                }
+            },
+            "required": [
+                "input"
+            ],
+            "optional": []
+        }
+    }
+]

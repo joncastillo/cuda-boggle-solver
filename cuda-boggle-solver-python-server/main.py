@@ -21,14 +21,14 @@ def check_and_download_files():
         "french": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/french.txt",
         "italian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/italian.txt",
         "spanish": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/spanish.txt",
-        #"russian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/russian.txt"
+        "russian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/russian.txt"
     }
     file_paths = {
         "english": "./words.txt",
         "french": "./french.txt",
         "italian": "./italian.txt",
         "spanish": "./spanish.txt",
-        #"russian": "./russian.txt",
+        "russian": "./russian.txt",
 
     }
     for language, url in word_urls.items():
@@ -78,11 +78,11 @@ def populate_dictionary():
     """
     Add words to a custom dictionary. The wordlist should be a string containing space-separated words. Most unicode characters are allowed.
 
-    - **URL**: `/destroy_custom_dictionary`
+    - **URL**: `/populate_dictionary`
     - **Method**: `POST`
     - **Request JSON**:
         - `dictionary` (str): The name of the custom dictionary.
-        - `wordlist` (str): lsit of words to store in the custom dictionary.
+        - `wordlist` (str): List of words to store in the custom dictionary.
     - **Response JSON**:
         - `result` (str): status message.
     """
@@ -95,9 +95,9 @@ def populate_dictionary():
 @app.route('/obtain_words', methods=['POST'])
 def obtain_words():
     """
-    Obtain words from a given text for use is populate dictionary. This returns a list of words in the form of a space-separated string.
+    Obtain words from a given text for use in populate_dictionary. This returns a list of words in the form of a space-separated string.
 
-    - **URL**: `/verify_words`
+    - **URL**: `/obtain_words`
     - **Method**: `POST`
     - **Request JSON**:
         - `text` (str): The text to check.
@@ -134,11 +134,11 @@ def similarity_check_of_two_texts():
     """
     How similar are two texts. Uses the formula log (common_characters+1) / log (unique_characters+1)
 
-    - **URL**: `/calculate_text_integrity_from_bitmask`
+    - **URL**: `/similarity_check_of_two_texts`
     - **Method**: `POST`
     - **Request JSON**:
-        - `text1` (str): Name of the first dictionary
-        - `text2` (str): Name of the second dictionary
+        - `text1` (str): Name of the first text
+        - `text2` (str): Name of the second text
     - **Response JSON**:
         - `result` (number): The estimated percentage similarity of the two texts.
     """
@@ -157,7 +157,7 @@ def verify_words():
     - **Method**: `POST`
     - **Request JSON**:
         - `text` (str): The text to check.
-        - `language` (str): The language of the text. Supports "Russian", "English", "Spanish", "Italian" and "French".
+        - `dictionary` (str): The dictionary to use. Supports "Russian", "English", "Spanish", "Italian", "French" and custom dictionaries.
     - **Response JSON**:
         - `result` (str): A CSV string of booleans indicating the presence of each word in the language dictionary.
     """
@@ -176,12 +176,12 @@ def logical_not():
     - **URL**: `/logical_not`
     - **Method**: `POST`
     - **Request JSON**:
-        - `input1` (str): A CSV string of booleans.
+        - `input` (str): A CSV string of booleans.
     - **Response JSON**:
         - `result` (str): A CSV string of booleans, with each boolean negated.
     """
     data = request.get_json()
-    input_csv = data.get("input1")
+    input_csv = data.get("input")
     result = logic_operation_service_instance.logicalNotString(input_csv)
     return jsonify({"result": result})
 
