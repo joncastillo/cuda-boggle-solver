@@ -64,6 +64,12 @@ void HostTrie::buildTrie(size_t maxWordSize) {
     m_pdev_trieData = thrust::raw_pointer_cast(d_trieData.data());
 }
 
+void HostTrie::destroyTrie() {
+    d_trieData.clear();
+    d_trieData.shrink_to_fit();  // Optional, forces deallocation of unused capacity
+    m_pdev_trieData = nullptr;
+}
+
 bool HostTrie::searchFromHost(const std::u32string& wordToSearchUtf32) {
 
     // Run CUDA kernel to test search for word

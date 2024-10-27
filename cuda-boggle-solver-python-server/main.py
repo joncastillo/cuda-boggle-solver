@@ -21,14 +21,14 @@ def check_and_download_files():
         "french": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/french.txt",
         "italian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/italian.txt",
         "spanish": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/spanish.txt",
-        "russian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/russian.txt"
+        #"russian": "https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/russian.txt"
     }
     file_paths = {
         "english": "./words.txt",
         "french": "./french.txt",
         "italian": "./italian.txt",
         "spanish": "./spanish.txt",
-        "russian": "./russian.txt",
+        #"russian": "./russian.txt",
 
     }
     for language, url in word_urls.items():
@@ -38,25 +38,27 @@ def check_and_download_files():
 @app.route('/create_custom_dictionary', methods=['POST'])
 def create_custom_dictionary():
     """
-    Create a new custom Trie-based dictionary. This uses CUDA on the backend to speed up searches on verify words on large text corpuses. You will need to call Populate_Dictionary to store words. IMPORTANT: Make sure to destroy_custom_dictionary after use to avoid memory congestion.
+    Create a new custom Trie-based dictionary. This uses CUDA on the backend to speed up searches on large text corpuses. You will need to call Populate_Dictionary to store words. IMPORTANT: Make sure to destroy_custom_dictionary to free resources and stop charges.
 
     - **URL**: `/create_custom_dictionary`
     - **Method**: `POST`
     - **Request JSON**:
         - `dictionary` (str): The name of the custom dictionary.
+        - `maxWordLength` (number): The maximum length of a word for this dictionary. Defaults to 20.
     - **Response JSON**:
         - `result` (str): status message.
     """
     data = request.get_json()
     dictionary = data.get("dictionary")
+    maxWordLength = data.get("maxWordLength", 20)
 
-    result = dictionary_service_instance.create_custom_dictionary(language, text)
+    result = dictionary_service_instance.create_custom_dictionary(dictionary, maxWordLength)
     return jsonify({"result": "OK"})
 
 @app.route('/destroy_custom_dictionary', methods=['POST'])
 def destroy_custom_dictionary():
     """
-    Create a new custom Trie-based dictionary. This uses CUDA on the backend to speed up searches on verify words on large text corpuses. You will need to call Populate_Dictionary to store words. IMPORTANT: Make sure to destroy_custom_dictionary after use to avoid memory congestion.
+    Destroys the dictionary from the server.
 
     - **URL**: `/destroy_custom_dictionary`
     - **Method**: `POST`
@@ -68,7 +70,7 @@ def destroy_custom_dictionary():
     data = request.get_json()
     dictionary = data.get("dictionary")
 
-    result = dictionary_service_instance.destroy_custom_dictionary(language, text)
+    result = dictionary_service_instance.destroy_custom_dictionary(dictionary)
     return jsonify({"result": "OK"})
 
 @app.route('/populate_dictionary', methods=['POST'])
@@ -90,6 +92,24 @@ def populate_dictionary():
     result = dictionary_service_instance.populate_dictionary(dictionary, wordlist)
     return jsonify({"result": "OK"})
 
+@app.route('/obtain_words', methods=['POST'])
+def obtain_words():
+    """
+    Obtain words from a given text for use is populate dictionary. This returns a list of words in the form of a space-separated string.
+
+    - **URL**: `/verify_words`
+    - **Method**: `POST`
+    - **Request JSON**:
+        - `text` (str): The text to check.
+    - **Response JSON**:
+        - `result` (str): A space separated string of words..
+    """
+    data = request.get_json()
+    text = data.get("text")
+
+    result = dictionary_service_instance.obtain_words(text)
+    return jsonify({"result": result})
+
 @app.route('/similarity_check_of_two_dictionaries', methods=['POST'])
 def similarity_check_of_two_dictionaries():
     """
@@ -110,7 +130,7 @@ def similarity_check_of_two_dictionaries():
     return jsonify({"result": result * 100})
 
 @app.route('/similarity_check_of_two_texts', methods=['POST'])
-def similarity_check_of_two_dictionaries():
+def similarity_check_of_two_texts():
     """
     How similar are two texts. Uses the formula log (common_characters+1) / log (unique_characters+1)
 
@@ -255,7 +275,7 @@ def calculate_bitmask_accuracy():
     """
     data = request.get_json()
     bitmask = data.get("bitmask")
-    result = dictionary_service_instance.calculate_bitmask_accuracy(bitmask)
+    result = logic_operation_service_instance.calculate_bitmask_relevance(bitmask)
     return jsonify({"result": result * 100})
 
 

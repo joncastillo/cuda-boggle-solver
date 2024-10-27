@@ -23,9 +23,9 @@ PYBIND11_MODULE(dictionary_service, m) {
             py::arg("language"),
             py::arg("input"),
             "Check words in the specified language's dictionary")
-        .def("create_dictionary", &DictionaryService::createDictionary, py::arg("dictionaryName"), py::arg("maxWordLength"),
+        .def("create_custom_dictionary", &DictionaryService::createDictionary, py::arg("dictionaryName"), py::arg("maxWordLength"),
             "Create a new dictionary with the specified name and maximum word length")
-        .def("delete_dictionary", &DictionaryService::deleteDictionary, py::arg("dictionaryName"),
+        .def("destroy_custom_dictionary", &DictionaryService::deleteDictionary, py::arg("dictionaryName"),
             "Delete the dictionary with the specified name")
         .def("obtain_words",
             [](DictionaryService& self, const py::str& text) {
@@ -46,9 +46,9 @@ PYBIND11_MODULE(dictionary_service, m) {
             "Populate a dictionary with space-separated words")
         .def("collect_words", &DictionaryService::collectWords, py::arg("dictionary"),
             "Collect words from a specified dictionary")
-        .def("similarity_by_common_words", &DictionaryService::similarityByCommonWords, py::arg("dictionary1"), py::arg("dictionary2"),
+        .def("similarity_check_of_two_dictionaries", &DictionaryService::similarityByCommonWords, py::arg("dictionary1"), py::arg("dictionary2"),
             "Compute similarity based on common words between two dictionaries")
-        .def("similarity_by_common_symbols",
+        .def("similarity_check_of_two_texts",
             [](DictionaryService& self, const py::str& text1, const py::str& text2) {
                 std::u32string u32text1 = utf8ToUtf32(text1.cast<std::string>());
                 std::u32string u32text2 = utf8ToUtf32(text2.cast<std::string>());
@@ -66,5 +66,6 @@ PYBIND11_MODULE(dictionary_service, m) {
         .def("logicalXorStrings", &LogicOperationService::logicalXorStrings)
         .def("logicalNotString", &LogicOperationService::logicalNotString)
         .def("splitU32StringToWords", &LogicOperationService::splitU32StringToWords)
-        .def("filterWordsByBoolean", &LogicOperationService::filterWordsByBoolean);
+        .def("filterWordsByBoolean", &LogicOperationService::filterWordsByBoolean)
+        .def("calculate_bitmask_relevance", &LogicOperationService::getAccuracyFromBooleanMask);
 }
